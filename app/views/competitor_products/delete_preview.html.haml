@@ -1,0 +1,58 @@
+%ol.breadcrumb
+    -if @customer
+        %li
+            %a{ :href=> "#{customers_url}" }= tr('customers')
+        %li
+            %a{ :href=> "#{customer_url(@customer.name)}" }= @customer.name
+        %li
+            %a{ :href=> "#{customer_competitor_products_url(@customer.name)}" }= tr('competitor_products')
+        %li.active= tr('delete')
+
+%h2= tr('delete') + ' ' + tr('preview')
+
+= render :partial => 'application/form_errors', :locals => { :record => @record }
+- if flash[:error]
+    .alert.alert-danger= flash[:error]
+- if flash[:warn]
+    .alert.alert-info= flash[:warn]
+- if flash[:success]
+    .alert.alert-success= flash[:success]
+
+= render :partial => 'form', :locals => { :action => 'delete', :actionLabel => 'delete', :cancel_url => customer_competitor_products_url(@customer.name)  }
+%br
+%br
+
+
+.col-sm-6
+    %p{ style: 'color:red;' }
+        The following <b>#{@products_to_delete.size}</b> records will be removed from the Competitor Products list.
+    %table.table.table-striped.table-bordered
+        %caption Competitor Products
+        %thead
+            %tr
+                %th= 'online_store'
+                %th= 'country'
+                %th= 'rpc'
+        %tbody
+            - @products_to_delete.each do |record|
+                %tr
+                    %td= record[0]
+                    %td= record[2]
+                    %td= record[1]
+- unless @products_not_found.blank?
+    .col-sm-6
+        %p{ style: 'color:orange;' }
+            The following <b>#{@products_not_found.size}</b> records from the CSV file were not found in the Competitor Products list.
+        %table.table.table-striped.table-bordered
+            %caption Competitor Products
+            %thead
+                %tr
+                    %th= 'online_store'
+                    %th= 'country'
+                    %th= 'rpc'
+            %tbody
+                - @products_not_found.each do |record|
+                    %tr
+                        %td= record[0]
+                        %td= record[2]
+                        %td= record[1]

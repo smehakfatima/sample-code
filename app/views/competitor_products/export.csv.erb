@@ -1,0 +1,45 @@
+<%=raw(["\xEF\xBB\xBF".force_encoding("UTF-8"),CSV.generate(:encoding => "utf-8") do |csv|
+
+    header = ['retailer', 'country', 'rpc', 'gtin', 'trusted_product_desc', 'brand', 'category', 'msrp', 'min_price', 'max_price', 'url', 'manufacturer', 'dimension1', 'dimension2', 'dimension3', 'dimension4', 'dimension5', 'dimension6', 'dimension7', 'dimension8', 'active', 'status', 'lookup_code']
+
+    @record_array = []
+    @online_stores = @customer.online_stores
+
+    csv << header
+    all_online_stores = OnlineStore.all
+    @records.each do | record|
+        begin
+            online_store = all_online_stores.find(record.online_store_id)
+        rescue
+            online_store = nil
+        end
+
+          unless online_store.nil?
+            csv << [online_store.name,
+                    record.country,
+                    record.rpc,
+                    record.gtin,
+                    record.trusted_product_desc,
+                    record.brand, record.category,
+                    record.msrp,
+                    record.min_price,
+                    record.max_price,
+                    record.url,
+                    record.manufacturer,
+                    record.dimension1,
+                    record.dimension2,
+                    record.dimension3,
+                    record.dimension4,
+                    record.dimension5,
+                    record.dimension6,
+                    record.dimension7,
+                    record.dimension8,
+                    record.active,
+                    record.status,
+                    record.lookup_code
+                  ]
+         end
+    end
+
+  end
+].pack("A*A*"))%>

@@ -1,0 +1,41 @@
+-if action == 'preview'
+    - form_action = preview_customer_competitor_products_url(@customer.name)
+-elsif action == 'delete_preview'
+    - form_action = delete_preview_customer_competitor_products_url(@customer.name)
+-elsif action == 'delete'
+    - form_action = delete_customer_competitor_products_url()
+-else
+    - form_action = customer_competitor_products_url()
+
+%form.form-horizontal{ :id => "import-competitor-products-form-#{action}", :action=>"#{form_action}", :method=>'POST', :enctype => (action == 'preview' || action == 'delete_preview') ? 'multipart/form-data' : 'application/x-www-form-urlencoded' }
+    .form-group
+        -if action == 'preview'
+            .col-sm-12
+                .alert.alert-info NOTE: CSV files should have those columns in the following order: <br/>retailer, country, rpc, gtin, trusted_product_desc, brand, category, msrp, min_price, max_price, url, manufacturer, dimension1, dimension2, dimension3, dimension4, dimension5, dimension6, dimension7, dimension8, active, status, lookup_code
+            .col-sm-5
+            .col-sm-7
+                %input{ :id=>'import-competitor-products-file', :name=>'file', :type=>'file' }
+            .col-sm-5
+            .col-sm-7
+                - if params[:delete_from_db_if_not_in_the_csv]=='true'
+                    %input{ :name=>'delete_from_db', :type=>'checkbox', :value=>"true",:id=>'delete_from_db',:checked=>'checked'}
+                - else
+                    %input{ :name=>'delete_from_db', :type=>'checkbox', :value=>"true",:id=>'delete_from_db'}
+
+                %label.control-label{ :for=>"delete_from_db" }= tr('delete_all_existing_competitor_products_for_this_customer')
+        -elsif action == 'delete_preview'
+            .col-sm-12
+                .alert.alert-info NOTE: The products in the CSV will be removed from the Competitor Products list based on the fields <b>retailer, country, rpc</b>
+            .col-sm-5
+            .col-sm-7
+                %input{ :name=>'file', :type=>'file'}
+        -elsif action == 'delete'
+            %input{:name => 'to_be_deleted', :type=>'hidden', :value => @rows.to_json}
+        -else
+            = render :partial => 'section', :locals => { :data_set => @record.new_competitor_rows,:data_type=>'added'}
+            = render :partial => 'section', :locals => { :data_set => @record.updated_competitor_rows,:data_type=>'updated'}
+            -if @record.delete_all
+                = render :partial => 'section', :locals => { :data_set => @record.deleted_competitor_rows,:data_type=>'deleted'}
+                = render :partial => 'section', :locals => { :data_set => [],:data_type=>'unchanged'}
+
+    = render :partial => 'application/form_buttons', :locals => { :action => action,:actionLabel=>actionLabel, :cancel_url => cancel_url}

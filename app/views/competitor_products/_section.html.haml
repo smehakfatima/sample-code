@@ -1,0 +1,42 @@
+- added_count = @record.new_competitor_rows_count.to_s
+- updated_count = @record.updated_competitor_rows.count.to_s
+- deleted_count = @record.deleted_competitor_rows_count.to_s
+
+%input{:name=>"to_be_#{data_type}", :type=>'hidden', :value=>"#{data_set.to_json}"}
+%input{:name => 'delete_all', :type=>'hidden', :value => @to_be_deleted.to_json}
+
+- if data_type == 'added' && added_count.to_i > 0
+    %input{:name=>"to_be_added_count", :type=>'hidden', :value=> added_count }
+    .col-sm-12
+        .h4
+            =tr('items_to_be_'+data_type) + ' - ' + added_count
+    %div{ :class=>"col-sm-12 alert alert-success"}
+        - @record.online_stores_product_count.each do |key,store|
+            %div
+                = "#{store[:retailer]} #{store[:country]} -  #{store[:count]} products to be #{data_type}. Please note that blank dimension values 1 - 8 will be assigned a default value 'UNCATEGORIZED'."
+- if data_type == 'updated' && updated_count.to_i > 0
+    %input{:name=>"to_be_updated_count", :type=>'hidden', :value=> updated_count }
+    .col-sm-12
+        .h4
+            =tr('items_to_be_'+data_type) + ' - ' + updated_count
+    %div{ :class=>"col-sm-12 alert alert-warning"}
+        - @record.online_stores_product_count_updated.each do |key,store|
+            %div
+                = "#{store[:retailer]} #{store[:country]} -  #{store[:count]} products to be #{data_type}. Please note that blank dimension values 1 - 8 will be assigned a default value 'UNCATEGORIZED'."
+- if data_type == 'unchanged'
+    .col-sm-12
+        .h4
+            =tr('items_to_be_'+data_type) + ' - ' + @record.unchanged_competitor_rows.count.to_s
+    %div{ :class=>"col-sm-12 alert alert-info"}
+        - @record.online_stores_product_count_unchanged.each do |key,store|
+            %div
+                = "#{store[:retailer]} #{store[:country]} -  #{store[:count]} products will be left #{data_type}."
+- if data_type == 'deleted'
+    %input{:name=>"to_be_deleted_count", :type=>'hidden', :value=> deleted_count }
+    .col-sm-12
+        .h4
+            =tr('items_to_be_'+data_type) + ' - ' + deleted_count
+    %div{ :class=>"col-sm-12 alert alert-danger"}
+        - @record.online_stores_product_count_delete.each do |key,store|
+            %div
+                = "#{store[:retailer]} #{store[:country]} -  #{store[:count]} products to be #{data_type}."

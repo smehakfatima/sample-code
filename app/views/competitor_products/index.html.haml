@@ -1,0 +1,116 @@
+:javascript
+	window.customerId = #{@customer.id};
+	window.is_classification_hierarchy_on = #{@customer.classification_hierarchy};
+%ol.breadcrumb
+	-if @customer
+		%li
+			%a{ :href=> "#{customers_url}" }= tr('customers')
+		%li
+			%a{ :href=> "#{customer_url(@customer.name)}" }= @customer.name
+		%li.active= tr('competitor_products')
+%h2= tr('competitor_products')
+-if @customer.standard_catalog_parent.present? || @customer.is_standard_catalog_parent
+	.alert.alert-danger= tr("restrict_competitor_product_message", action_name: "manage competitor", user_type: (@customer.is_standard_catalog_parent ? "Standard Catalog Parent" : "Linked Customer" ) )
+-else	
+	- if @customer
+		- online_store_list = @customer.online_stores
+	-if @customer
+		%ul.nav.nav-tabs
+			%li.active
+				%a{ :href=>"#search", :data => { :toggle => "tab" }}
+					= tr('search')
+			%li
+				%a{ :href=>"#upload", :data => { :toggle => "tab" }}
+					= tr('import')
+			%li
+				%a{ :href=>"#export", :data => { :toggle => "tab" }}
+					= tr('export')
+			%li
+				%a{ :href=>"#delete", :data => { :toggle => "tab" }}
+					= tr('delete')
+			%li
+				%a{ :href=>"#delete_all", :data => { :toggle => "tab" }}
+					= tr('delete_all_records')
+
+	.tab-content{ :style=>'margin-top: 20px;'}
+		.tab-pane#upload
+			.row
+				.col-sm-8
+
+				= render :partial => 'application/form_errors', :locals => { :record => @customer }
+
+				= render :partial => 'form', :locals => { :action => 'preview', :actionLabel => 'preview', :record => @customer, :cancel_url => customer_url(@customer.name)  }
+				.col-sm-12#resultLog
+			.tab-content{ :style=>'margin-top: 20px;'}
+
+		- if @customer
+			.tab-pane#export
+				.row
+				%form.form-horizontal{role: "form", action: "#{export_customer_competitor_products_url(@customer.name, :format => :csv)}"}
+					.form-group
+						.col-sm-2
+						%label.control-label{ :for=>"online_store", :name => "Online Store" }
+						.col-sm-10
+						%select.form-control{ :name=>'online_store_id', :id=>"online_store" }
+							%option{ :value=>""} If you wish to filter by online store please select
+							- online_store_list.each do |store|
+								%option{ :value=>"#{store.id}"}= "#{store.name} #{store.country}"
+						.col-sm-12
+							.form-actions
+								%button#exportButton.btn.btn-primary{type: "submit"}= tr('export')
+				.row
+
+		.tab-pane#delete
+			.row
+				.col-sm-8
+
+				= render :partial => 'application/form_errors', :locals => { :record => @customer }
+
+				= render :partial => 'form', :locals => { :action => 'delete_preview', :actionLabel => 'preview', :record => @customer, :cancel_url => customer_url(@customer.name)  }
+				.col-sm-12#resultLog
+			.tab-content{ :style=>'margin-top: 20px;'}
+
+		.tab-pane#delete_all
+			.tab-content{ :style=>'margin-left: 500px;'}
+
+				= link_to delete_all_customer_competitor_products_url, :class => 'btn btn-sm btn-danger', :confirm => 'Warning: All competitor products records will be deleted for this customer. Are you sure you want to continue?',:method => :delete do
+					%span.glyphicon.glyphicon-trash
+					=tr('delete_all_customer_records', :customer => @customer.name)
+
+		.tab-pane.active#search
+
+			- if flash[:error]
+				.alert.alert-danger
+					= flash[:error]
+
+			- if flash[:success]
+				.alert.alert-success= flash[:success]
+			%p
+
+
+			%table.table.table-striped.table-bordered.pagedTable{'data-server_side_paging'=>'true'}
+				%thead
+					%tr
+						%th= tr('manufacturer')
+						%th= tr('online_store')
+						%th= tr('country')
+						%th= tr('rpc')
+						%th= tr('trusted_product_description')
+						%th= tr('gtin')
+						%th= tr('brand')
+						%th= tr('category')
+						%th= tr('msrp')
+						%th= tr('min_price')
+						%th= tr('max_price')
+						%th= tr('url')
+						%th= tr('dimension1')
+						%th= tr('dimension2')
+						%th= tr('dimension3')
+						%th= tr('dimension4')
+						%th= tr('dimension5')
+						%th= tr('dimension6')
+						%th= tr('dimension7')
+						%th= tr('dimension8')
+						%th= tr('active')
+						%th= tr('status')
+						%th= tr('lookup_code')
